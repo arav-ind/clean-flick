@@ -1,5 +1,5 @@
 export function getSeverityLevels(parentsGuide) {
-    const result = {}
+    const result: Record<string, string> = {}
 
     for (const category of parentsGuide) {
         const breakdowns = category.severityBreakdowns

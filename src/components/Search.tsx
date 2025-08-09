@@ -1,6 +1,7 @@
 import { createSignal, onCleanup } from 'solid-js'
 import { FiSearch } from 'solid-icons/fi'
 import MovieList from './MovieList'
+import { useSearchParams } from '@solidjs/router'
 
 interface InputEvent extends Event {
     currentTarget: HTMLInputElement
@@ -8,14 +9,14 @@ interface InputEvent extends Event {
 }
 
 export default function Search() {
-    const [debouncedQuery, setDebouncedQuery] = createSignal('')
+    const [searchParams, setSearchParams] = useSearchParams()
     let debounceTimer: ReturnType<typeof setTimeout>
 
     const handleInput = (e: InputEvent) => {
         const value = e.currentTarget.value
         clearTimeout(debounceTimer)
         debounceTimer = setTimeout(() => {
-            setDebouncedQuery(value)
+            setSearchParams({ q: value })
         }, 500)
     }
 
@@ -32,10 +33,11 @@ export default function Search() {
                     class='w-full focus:outline-none'
                     aria-label='Search'
                     onInput={handleInput}
+                    value={searchParams.q || ''}
                 />
                 <FiSearch />
             </div>
-            <MovieList debouncedQuery={debouncedQuery} />
+            <MovieList />
         </>
     )
 }

@@ -1,6 +1,7 @@
 import { createResource, For, Show, Accessor } from 'solid-js'
 import TileItem from './TileItem'
 import { BASE_URL } from '../api/api'
+import { useSearchParams } from '@solidjs/router'
 
 async function fetchTitles(query: string) {
     if (!query.trim()) return []
@@ -13,8 +14,10 @@ async function fetchTitles(query: string) {
     return data.titles || []
 }
 
-export default function MovieList(props: { debouncedQuery: Accessor<string> }) {
-    const [results] = createResource(props.debouncedQuery, fetchTitles, {
+export default function MovieList() {
+    const [searchParams] = useSearchParams()
+    const query = () => searchParams.q || ""
+    const [results] = createResource(query, fetchTitles, {
         initialValue: [],
     })
 

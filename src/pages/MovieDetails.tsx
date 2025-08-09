@@ -1,16 +1,26 @@
 import { useParams } from '@solidjs/router'
 import { BASE_URL } from '../api/api'
 import { createResource, For, Show } from 'solid-js'
+import ParentsGuide from '../components/ParentsGuide'
+
+const parentalRatingCache: Record<string, any[]> = {}
 
 async function getParentalRating(id: string) {
     if (!id.trim()) return []
-    const res = await fetch(
-        `${BASE_URL}/titles/${id}/parentsGuide`,
-        { headers: { accept: 'application/json' } }
-    )
-    if (!res.ok) throw new Error('Failed to fetch')
+
+    if (parentalRatingCache[id]) {
+        return parentalRatingCache[id]
+    }
+
+    const res = await fetch(`${BASE_URL}/titles/${id}/parentsGuide`, {
+        headers: { accept: "application/json" },
+    })
+
+    if (!res.ok) throw new Error("Failed to fetch")
+
     const data = await res.json()
-    return data.parentsGuide || []
+    parentalRatingCache[id] = data.parentsGuide || []
+    return parentalRatingCache[id]
 }
 
 export default function MovieDetails() {
@@ -22,10 +32,8 @@ export default function MovieDetails() {
         <div class='p-4'>
             <h1 class='text-2xl font-bold'>Parental Guidance</h1>
             <p class='mt-2'>{params.id}</p>
-            <Show when={results()}>
-                <For each={results()}>
-                    {(item) => <p>{item.category}</p>}
-                </For>
+            <Show when={results().length > 0}>
+                <ParentsGuide parentsGuide={results} />
             </Show>
         </div>
     )
